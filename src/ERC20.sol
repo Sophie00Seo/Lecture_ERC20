@@ -88,12 +88,22 @@ contract ERC20{
 
     function _mint(address _owner, uint256 _value) internal {
         require(_owner != address(0), "mint to zero address");
-        balances[_owner] += _value;
+        
         _totalSupply += _value;
+        unchecked {
+            balances[_owner] += _value;
+        }
+        emit Transfer(address(0), _owner, _value);
     }
     function _burn(address _owner, uint256 _value) internal {
         require(_owner != address(0), "burn from zero address");
-        balances[_owner] -= _value;
-        _totalSupply -= _value;
+        require(balances[_owner] >= _value, "burn amount exceeds balance");
+
+        unchecked{
+            balances[_owner] -= _value;
+            _totalSupply -= _value;
+        }
+
+        emit Transfer(_owner, address(0), _value);
     }
 }
